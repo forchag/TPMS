@@ -1,0 +1,8 @@
+# Maven build artifacts
+**/target/
+
+# Generated zip of static resources
+**/static.zip
+
+# IDE files
+.vscode/
