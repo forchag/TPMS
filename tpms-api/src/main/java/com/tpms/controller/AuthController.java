@@ -4,6 +4,8 @@ import com.tpms.dto.JwtResponse;
 import com.tpms.dto.LoginRequest;
 import com.tpms.dto.SignupRequest;
 import com.tpms.service.AuthService;
+import com.tpms.security.JwtTokenProvider;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +21,11 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtTokenProvider jwtTokenProvider) {
         this.authService = authService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     /**
@@ -40,5 +44,19 @@ public class AuthController {
     public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest request) {
         String token = authService.login(request);
         return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    /**
+     * Verify the provided JWT.
+     */
+    @GetMapping("/verify")
+    public ResponseEntity<Void> verify(@RequestHeader(value = "Authorization", required = false) String header) {
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            if (jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.ok().build();
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
