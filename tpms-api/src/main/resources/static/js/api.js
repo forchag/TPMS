@@ -100,12 +100,12 @@ class APIService {
   }
 
   // Student endpoints
-  async getStudentProfile() {
-    return this.request("/students/profile")
+  async getStudentProfile(studentId) {
+    return this.request(`/profile/${encodeURIComponent(studentId)}`)
   }
 
-  async updateStudentProfile(profileData) {
-    return this.request("/students/profile", {
+  async updateStudentProfile(studentId, profileData) {
+    return this.request(`/profile/${encodeURIComponent(studentId)}`, {
       method: "PUT",
       body: JSON.stringify(profileData),
     })
