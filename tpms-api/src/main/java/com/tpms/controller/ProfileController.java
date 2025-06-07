@@ -16,14 +16,14 @@ public class ProfileController {
     private final StudentService studentService;
     public ProfileController(StudentService ss) { this.studentService = ss; }
 
-    @PreAuthorize("hasRole('ADMIN') or #studentId == authentication.name")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_STUDENT') and #studentId == authentication.name)")
     @GetMapping("/{studentId}")
     public ResponseEntity<StudentDto> getProfile(@PathVariable String studentId) {
         Optional<Student> opt = studentService.getStudentById(studentId);
         return opt.map(StudentMapper::toDto).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #studentId == authentication.name")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_STUDENT') and #studentId == authentication.name)")
     @PutMapping("/{studentId}")
     public ResponseEntity<StudentDto> updateProfile(@PathVariable String studentId,
                                                     @RequestBody StudentDto dto) {
